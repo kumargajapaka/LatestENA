@@ -1,0 +1,52 @@
+---
+- name: Install build dependencies
+  yum: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - dkms
+
+- name: Clone driver source
+  git:   
+    repo: https://github.com/amzn/amzn-drivers
+    dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}"
+    version: "ena_linux_{{ aws_ena_version }}"
+
+- name: Create DKMS conf file
+  template: 
+    src: dkms.conf.j2
+    dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}/dkms.conf"
+
+- name: Add module to DKMS
+  command: "dkms add -m amzn-drivers -v {{ aws_ena_version}}"
+
+- name: Build module
+  command: "dkms build -m amzn-drivers -v {{ aws_ena_version}}"
+
+- name: Install module
+  command: "dkms install -m amzn-drivers -v {{ aws_ena_version}}" 
+
+- name: Load modules 
+  shell: dracut -f -v
+
+- name: check dkms status 
+  shell: dkms status
+
+- name: Reboot the server 
+  reboot: 
+    reboot_timeout: 600
+
+- name: Verify latest version of ena 
+  shell: 'modinfo ena | grep -i "^version:" | grep -Po "(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)"'
+  register: install_ena_version
+
+- name: run ethtool to get version 
+  shell: ethtool -i eth0
+  register: ethtool_eth0
+
+- name: run ethtool to get version 
+  shell: ethtool -i ens3
+  register: ethtool_ens3
+  
+- debug: var=ethtool_eth0.stdout
+- debug: var=ethtool_ens3.stdout

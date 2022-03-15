@@ -1,0 +1,10 @@
+---
+- name: Get current version of ena 
+  shell: 'modinfo ena | grep -i "^version:" | grep -Po "(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)"'
+  register: current_ena_version
+  ignore_errors: true 
+
+- name: "Install aws ena version {{ aws_ena_version }}"
+  include_tasks: install_ena.yml
+  when: current_ena_version.stdout is defined and (current_ena_version.stdout < aws_ena_version)
+  

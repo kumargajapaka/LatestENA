@@ -1,0 +1,7 @@
+---
+- hosts: aws_instance
+  gather_facts: true 
+  become: true
+
+  roles: 
+    - role: aws-ena
