@@ -1,19 +1,23 @@
 ---
+
 - name: Install build dependencies
-  yum: 
+  yum:
     name: "{{ item }}"
     state: present
   with_items:
+    - kernel-debug-devel
+    - kernel-devel
     - dkms
+    - git
 
 - name: Clone driver source
-  git:   
+  git:
     repo: https://github.com/amzn/amzn-drivers
     dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}"
     version: "ena_linux_{{ aws_ena_version }}"
 
 - name: Create DKMS conf file
-  template: 
+  template:
     src: dkms.conf.j2
     dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}/dkms.conf"
 
@@ -24,29 +28,29 @@
   command: "dkms build -m amzn-drivers -v {{ aws_ena_version}}"
 
 - name: Install module
-  command: "dkms install -m amzn-drivers -v {{ aws_ena_version}}" 
+  command: "dkms install -m amzn-drivers -v {{ aws_ena_version}}"
 
-- name: Load modules 
+- name: Load modules
   shell: dracut -f -v
 
-- name: check dkms status 
+- name: check dkms status
   shell: dkms status
 
-- name: Reboot the server 
-  reboot: 
+- name: Reboot the server
+  reboot:
     reboot_timeout: 600
 
-- name: Verify latest version of ena 
+- name: Verify latest version of ena
   shell: 'modinfo ena | grep -i "^version:" | grep -Po "(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)"'
   register: install_ena_version
 
-- name: run ethtool to get version 
+- name: run ethtool to get version
   shell: ethtool -i eth0
   register: ethtool_eth0
 
-- name: run ethtool to get version 
+- name: run ethtool to get version
   shell: ethtool -i ens3
   register: ethtool_ens3
-  
+
 - debug: var=ethtool_eth0.stdout
 - debug: var=ethtool_ens3.stdout
