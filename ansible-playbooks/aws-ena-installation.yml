@@ -1,5 +1,5 @@
 ---
-- hosts: aws_instance
+- hosts: webservers
   gather_facts: true 
   become: true
 
