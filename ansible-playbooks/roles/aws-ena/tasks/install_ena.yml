@@ -16,6 +16,14 @@
     dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}"
     version: "ena_linux_{{ aws_ena_version }}"
 
+- name: removing old versions of ena drivers
+  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`; do dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i; done" 
+# ignore_errors: true
+
+#- name: removing old versions of ena drivers
+#  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`;do echo \"dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i\"; done"
+# ignore_errors: true
+
 - name: Create DKMS conf file
   template:
     src: dkms.conf.j2
@@ -47,10 +55,3 @@
 - name: run ethtool to get version
   shell: ethtool -i eth0
   register: ethtool_eth0
-
-- name: run ethtool to get version
-  shell: ethtool -i ens3
-  register: ethtool_ens3
-
-- debug: var=ethtool_eth0.stdout
-- debug: var=ethtool_ens3.stdout
