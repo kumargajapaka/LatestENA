@@ -4,7 +4,7 @@
   register: current_ena_version
   ignore_errors: true 
   
-- debug: var=current_ena_version
+- debug: var=current_ena_version.stdout
 
 #- name: "Install aws ena version {{ aws_ena_version }}"
 # include_tasks: install_ena.yml
