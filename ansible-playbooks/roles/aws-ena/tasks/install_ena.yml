@@ -10,11 +10,11 @@
     - dkms
     - git
 
-- name: Clone driver source
-  git:
-    repo: https://github.com/amzn/amzn-drivers
-    dest: "/usr/src/amzn-drivers-{{ aws_ena_version }}"
-    version: "ena_linux_{{ aws_ena_version }}"
+- name: Clone nexus source
+  shell: "curl -O -k 'https://nexuxlink' /tmp/amzn-drivers-{{ aws_ena_version }}"
+
+- name: untar binaries 
+  shell: "tar -xvf /tmp/amzn-drivers-{{ aws_ena_version }} /usr/src/amzn-drivers-{{ aws_ena_version }}"
 
 #- name: removing old versions of ena drivers
 # shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`; do dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i; done" 
