@@ -16,14 +16,15 @@
 - name: untar binaries 
   shell: "tar -xvf /tmp/amzn-drivers-{{ aws_ena_version }} /usr/src/amzn-drivers-{{ aws_ena_version }}"
 
-#- name: removing old versions of ena drivers
-# shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`; do dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i; done" 
-# ignore_errors: true
-
 - name: removing old versions of ena drivers
-  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`;do echo \"dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i\"; done"
+  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`; do dkms remove amzn-drivers/$i --all; /bin/rm -R /usr/src/amzn-drivers-$i; /bin/rm -R /var/lib/dkms/amzn-drivers/$i; done" 
   ignore_errors: true
   register: remove_oldversion
+
+#- name: removing old versions of ena drivers
+#  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`;do echo \"dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i\"; done"
+#  ignore_errors: true
+#  register: remove_oldversion
 
 - debug: var=remove_oldversion
 
