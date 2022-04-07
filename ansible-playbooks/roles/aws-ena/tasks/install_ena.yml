@@ -21,6 +21,19 @@
   ignore_errors: true
   register: remove_oldversion
 
+- name: remove /var/lib/dkms/amzn-drivers/ 
+  shell: "ls -d /usr/src/amzn-drivers* | grep -v 2.6.0"
+  register: get_old_drivers 
+
+- shell: "rm -rf {{ item }}"
+  with_items: "{{ get_old_drivers.stdout }}"
+
+- shell: "ls -ltr /var/lib/dkms/amzn-drivers/| awk ‘{print $NF}’ | grep -v 2.6.0 | grep -v original_module"
+  register: get_old_var_lib 
+
+- shell: " rm -rf {{ item }}"
+  with_items: "{{ get_old_var_lib.stdout }}"
+
 #- name: removing old versions of ena drivers
 #  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`;do echo \"dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i\"; done"
 #  ignore_errors: true
