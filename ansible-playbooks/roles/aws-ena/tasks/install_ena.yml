@@ -22,7 +22,7 @@
 # - name: removing old versions of ena drivers
 #   shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`; do dkms remove amzn-drivers/$i --all; /bin/rm -R /usr/src/amzn-drivers-$i; /bin/rm -R /var/lib/dkms/amzn-drivers/$i; done" 
 #   ignore_errors: true
-#   register: remove_oldversion
+###  register: remove_oldversion
 
 - name: grep - remove /usr/src
   shell: "ls -d /usr/src/amzn-drivers* | grep -v {{ aws_ena_version }}"
