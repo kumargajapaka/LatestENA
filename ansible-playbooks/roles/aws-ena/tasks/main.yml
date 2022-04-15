@@ -8,5 +8,4 @@
 
 - name: "Install aws ena version {{ aws_ena_version }}"
   include_tasks: install_ena.yml
-  when: current_ena_version.stdout is defined and (current_ena_version.stdout < aws_ena_version)
-  
+  # when: current_ena_version.stdout is defined and (current_ena_version.stdout < aws_ena_version)
