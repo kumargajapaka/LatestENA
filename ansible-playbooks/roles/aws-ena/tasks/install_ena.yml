@@ -12,8 +12,11 @@
     - git
 
 - name: Clone nexus source
-  shell: "curl -O -k 'https://nexuxlink' /tmp/amzn-drivers-{{ aws_ena_version }}"
-  when: current_ena_version.stdout is defined and (current_ena_version.stdout < aws_ena_version)
+  get_url: 
+    url: "{{  }}"
+
+  # shell: "curl -O -k 'https://nexuxlink' /tmp/amzn-drivers-{{ aws_ena_version }}"
+  # when: current_ena_version.stdout is defined and (current_ena_version.stdout < aws_ena_version)
 
 - name: untar binaries 
   shell: "tar -xvf /tmp/amzn-drivers-{{ aws_ena_version }} /usr/src/amzn-drivers-{{ aws_ena_version }}"
