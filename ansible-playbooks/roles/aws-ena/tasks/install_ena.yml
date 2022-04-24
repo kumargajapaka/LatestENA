@@ -27,25 +27,6 @@
 #   ignore_errors: true
 ###  register: remove_oldversion
 
-- name: grep - remove /usr/src
-  shell: "ls -d /usr/src/amzn-drivers* | grep -v {{ aws_ena_version }}"
-  register: get_old_drivers
-
-- debug:
-    msg: "{{ get_old_drivers }}"
-
-- name: remove /usr/src versions 
-  shell: "rm -rf {{ item }}"
-  with_items: "{{ get_old_drivers.stdout_lines }}"
-
-- name: grep /var/lib/dkms/amzn-drivers/
-  shell: "ls -ltr /var/lib/dkms/amzn-drivers/| awk ‘{print $NF}’ | grep -v {{ aws_ena_version }} | grep -v `uname -r` | grep -v original_module"
-  register: get_old_var_lib 
-
-- name: remove /var/lib
-  shell: " rm -rf {{ item }}"
-  with_items: "{{ get_old_var_lib.stdout_lines }}"
-
 #- name: removing old versions of ena drivers
 #  shell: "for i in `dkms status | grep -o -P '(?<=amzn-drivers, ).*(?=: added)'`;do echo \"dkms remove amzn-drivers/$i --all; /bin/rm -r /usr/src/amzn-drivers-$i; /bin/rm -r /var/lib/dkms/amzn-drivers/$i\"; done"
 #  ignore_errors: true
@@ -89,3 +70,28 @@
 - name: run ethtool to get version
   shell: ethtool -i eth0
   register: ethtool_eth0
+  when: ansible_distribution_major_version | int == 7
+
+- name: run ethtool to get version
+  shell: ethtool -i ens3
+  register: ethtool_ens3
+  when: ansible_distribution_major_version | int == 8
+
+- name: grep - remove /usr/src
+  shell: "ls -d /usr/src/amzn-drivers* | grep -v {{ aws_ena_version }}"
+  register: get_old_drivers
+
+- debug:
+    msg: "{{ get_old_drivers }}"
+
+- name: remove /usr/src versions 
+  shell: "rm -rf {{ item }}"
+  with_items: "{{ get_old_drivers.stdout_lines }}"
+
+- name: grep /var/lib/dkms/amzn-drivers/
+  shell: "ls -ltr /var/lib/dkms/amzn-drivers/| awk ‘{print $NF}’ | grep -v {{ aws_ena_version }} | grep -v `uname -r` | grep -v original_module"
+  register: get_old_var_lib 
+
+- name: remove /var/lib
+  shell: " rm -rf {{ item }}"
+  with_items: "{{ get_old_var_lib.stdout_lines }}"
